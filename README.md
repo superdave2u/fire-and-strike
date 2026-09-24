@@ -5,6 +5,8 @@ A retirement calculator for the FIRE (Financial Independence, Retire Early) comm
 1. **FIRE projection (current pace)** — enter your expected retirement spending, current age, current portfolio value and yearly contribution. The app runs a Monte Carlo simulation over real (inflation-adjusted) returns and charts the **p10 / p50 / p90** paths of your portfolio vs age, with the moment each percentile reaches your FIRE number (spending × 25, the 4% rule).
 2. **STRIKE plan (accelerated pace)** — declare a target retirement age. The app solves for the **extra yearly contribution** required so that the **median (p50)** path reaches FIRE exactly at that age, and charts the accelerated path against your current pace.
 
+Every edit is a **draft** — nothing is simulated until you press **Calculate**, which keeps typing responsive. A collapsed **Advanced assumptions** section exposes the draw rate, expected real returns and volatilities (defaults: 4% draw rate, 7%/2.5% returns, 18%/6% volatility), and the charts adapt to mobile widths.
+
 ## Quickstart
 
 ```bash

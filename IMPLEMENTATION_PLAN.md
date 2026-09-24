@@ -41,6 +41,14 @@ Conventions: value objects expose `static of(value)` factories that throw on inv
 - [x] **T14 — StrikeChart component** (`src/presentation/components/StrikeChart.tsx`)
   Done when: renders current vs accelerated p50 lines + FIRE line + target-age reference line + the "Extra yearly contribution needed" card (or "Already on pace"/"Not achievable" variants).
 - [x] **T15 — useFirePlan hook + App wiring** (`src/presentation/hooks/useFirePlan.ts`, `src/App.tsx`, `src/index.css`)
-  Done when: hook holds FR-6 defaults, derives both views via the use cases (memoized), clamps invalid input changes; App renders InputPanel + both chart sections and updates the FIRE-number readout and STRIKE card live as inputs change; template boilerplate (App.css, assets) removed.
+  Done when: hook holds FR-6 defaults, derives both views via the use cases (memoized), clamps invalid input changes; App renders InputPanel + both chart sections and updates the FIRE-number readout and STRIKE card on Calculate; template boilerplate (App.css, assets) removed.
 - [x] **T16 — GitHub Pages deployment** (`.github/workflows/deploy.yml`, `vite.config.ts` base already `/fire-and-strike/`)
   Done when: workflow has build job (npm ci → lint → typecheck → vitest run → build → configure-pages → upload-pages-artifact) and deploy job (needs: build, deploy-pages, environment github-pages, permissions pages:write + id-token:write, concurrency: pages); local `npm run gates` + `npm run build` green; `dist/index.html` references `/fire-and-strike/` assets; README deployment handoff steps verified.
+- [x] **T17 — Return assumptions + draw rate** (`ReturnAssumptions` value object, `AllocationMix` refactor, DTO wiring)
+  Done when: defaults are stocks 7%/18%, bonds 2.5%/6%; custom assumptions blend linearly; invalid assumptions throw; FIRE number = spending ÷ draw rate (5% → $1.2M for $60k spending).
+- [x] **T18 — Intentional Calculate step** (draft/applied split in `useFirePlan`, Calculate button in `InputPanel`)
+  Done when: edits update draft only (charts/readout unchanged, dirty status shown); Calculate applies the draft and recomputes once; clamps still apply to drafts.
+- [x] **T19 — Collapsed advanced assumptions** (`AdvancedSection` component)
+  Done when: native `<details>` collapsed by default with draw rate, stock/bond returns and volatilities pre-populated; percent inputs report fractions through `onChange`.
+- [x] **T20 — Responsive charts** (`useViewportWidth` hook, App wiring, mobile CSS)
+  Done when: chart width tracks viewport minus padding, clamped to 280–880; height 300 below 480 px; chart containers scroll horizontally as fallback; resize updates width.
