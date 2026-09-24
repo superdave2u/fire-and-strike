@@ -17,6 +17,9 @@ export class FireGoal {
     if (!Number.isFinite(multiplier) || multiplier <= 0) {
       throw new Error(`FireGoal multiplier must be positive, got: ${multiplier}`)
     }
+    if (!Number.isFinite(spending) || spending <= 0) {
+      throw new Error(`FireGoal spending must be a positive number, got: ${spending}`)
+    }
     return new FireGoal(Money.of(spending), multiplier)
   }
 }
