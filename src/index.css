@@ -34,6 +34,12 @@ section h2 {
   font-size: 1.15rem;
 }
 
+.chart-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 section > p {
   color: #334155;
   margin: 0.25rem 0 0.75rem;
