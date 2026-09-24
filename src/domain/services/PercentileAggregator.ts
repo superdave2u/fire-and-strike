@@ -24,8 +24,8 @@ export class PercentileAggregator {
     const crossSections: number[][] = Array.from({ length: ages }, (_, age) =>
       runs.map((run) => run[age]),
     )
-    const reduce = (p: number): number[] =>
-      crossSections.map((values) => this.percentile(values, p))
+    const sortedSections = crossSections.map((values) => [...values].sort((a, b) => a - b))
+    const reduce = (p: number): number[] => sortedSections.map((sorted) => this.percentile(sorted, p))
     return { p10: reduce(10), p50: reduce(50), p90: reduce(90) }
   }
 }

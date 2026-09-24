@@ -7,6 +7,7 @@ import { Money } from '../domain/model/Money'
 export const DEFAULT_HORIZON_AGE = 75
 export const SEED = 42
 export const RUNS = 10_000
+export const SOLVER_RUNS = 3_000
 
 export interface PlanInputs {
   currentAge: number
