@@ -2,29 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { MonteCarloFireProjector } from './MonteCarloFireProjector'
 import { PercentileAggregator } from './PercentileAggregator'
 import { GaussianReturnModel } from './GaussianReturnModel'
-import type { RandomGenerator } from '../ports/RandomGenerator'
-import type { PercentileFn } from '../ports/PercentileFn'
+import { CyclingDraws, fakePercentile } from './testFixtures'
 import { FireGoal } from '../model/FireGoal'
 import { Money } from '../model/Money'
-
-class CyclingDraws implements RandomGenerator {
-  private i = 0
-
-  private readonly draws: number[]
-
-  constructor(draws: number[]) {
-    this.draws = draws
-  }
-
-  standardNormal(): number {
-    return this.draws[this.i++ % this.draws.length]
-  }
-}
-
-const fakePercentile: PercentileFn = (values, p) => {
-  const sorted = [...values].sort((a, b) => a - b)
-  return sorted[Math.round((p / 100) * (sorted.length - 1))]
-}
 
 function makeProjector(runs = 1_000): MonteCarloFireProjector {
   return new MonteCarloFireProjector({
