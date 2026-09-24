@@ -1,0 +1,1 @@
+export type PercentileFn = (sortedValues: readonly number[], p: number) => number
