@@ -1,7 +1,4 @@
-const STOCK_MEAN = 0.07
-const STOCK_STD = 0.18
-const BOND_MEAN = 0.025
-const BOND_STD = 0.06
+import { ReturnAssumptions } from './ReturnAssumptions'
 
 export class AllocationMix {
   readonly stockWeight: number
@@ -14,12 +11,16 @@ export class AllocationMix {
     this.std = std
   }
 
-  static of(stockWeight: number): AllocationMix {
+  static of(
+    stockWeight: number,
+    assumptions: ReturnAssumptions = ReturnAssumptions.defaults(),
+  ): AllocationMix {
     if (!Number.isFinite(stockWeight) || stockWeight < 0 || stockWeight > 1) {
       throw new Error(`AllocationMix stock weight must be within [0, 1], got: ${stockWeight}`)
     }
-    const mean = stockWeight * STOCK_MEAN + (1 - stockWeight) * BOND_MEAN
-    const std = stockWeight * STOCK_STD + (1 - stockWeight) * BOND_STD
+    const { stock, bond } = assumptions
+    const mean = stockWeight * stock.mean + (1 - stockWeight) * bond.mean
+    const std = stockWeight * stock.std + (1 - stockWeight) * bond.std
     return new AllocationMix(stockWeight, mean, std)
   }
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { AllocationMix } from './AllocationMix'
+import { ReturnAssumptions } from './ReturnAssumptions'
 
 describe('AllocationMix', () => {
   it('blends stock and bond real-return parameters by weight', () => {
@@ -20,9 +21,16 @@ describe('AllocationMix', () => {
     expect(mix.std).toBeCloseTo(0.06, 12)
   })
 
+  it('blends custom return assumptions', () => {
+    const assumptions = ReturnAssumptions.of({ mean: 0.1, std: 0.2 }, { mean: 0, std: 0 })
+    const mix = AllocationMix.of(0.5, assumptions)
+    expect(mix.mean).toBeCloseTo(0.05, 12)
+    expect(mix.std).toBeCloseTo(0.1, 12)
+  })
+
   it('rejects weights outside [0, 1]', () => {
     expect(() => AllocationMix.of(-0.1)).toThrow()
     expect(() => AllocationMix.of(1.1)).toThrow()
-    expect(() => AllocationMix.of(NaN)).toThrow()
+    expect(() => AllocationMix.of(Number.NaN)).toThrow()
   })
 })

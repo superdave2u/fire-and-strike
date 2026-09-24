@@ -41,4 +41,20 @@ describe('ProjectFireTrajectory', () => {
     const view = useCaseWith(42).run({ ...DEFAULT_PLAN_INPUTS, stockWeight: 1 })
     expect(view.p50[1]).toBeCloseTo(100_000 * 1.07 + 30_000, 6)
   })
+
+  it('derives the FIRE number from the draw rate', () => {
+    const view = useCaseWith(42).run({ ...DEFAULT_PLAN_INPUTS, drawRate: 0.05 })
+    expect(view.fireNumber).toBeCloseTo(1_200_000, 6)
+  })
+
+  it('uses custom return assumptions for the blend', () => {
+    const view = useCaseWith(42).run({
+      ...DEFAULT_PLAN_INPUTS,
+      stockMean: 0,
+      bondMean: 0,
+      stockStd: 0,
+      bondStd: 0,
+    })
+    expect(view.p50[1]).toBeCloseTo(130_000, 6)
+  })
 })

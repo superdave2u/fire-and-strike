@@ -6,6 +6,7 @@ import type { RandomGenerator } from '../domain/ports/RandomGenerator'
 import {
   mixParameters,
   toProjectionInput,
+  fireMultiplier,
   type PlanInputs,
   type FireProjectionView,
 } from './dto'
@@ -45,7 +46,7 @@ export class ProjectFireTrajectory {
       p10: projection.p10,
       p50: projection.p50,
       p90: projection.p90,
-      fireNumber: FireGoal.of(inputs.annualSpending).target.value,
+      fireNumber: FireGoal.of(inputs.annualSpending, fireMultiplier(inputs.drawRate)).target.value,
       crossings: projection.crossings,
     }
   }
