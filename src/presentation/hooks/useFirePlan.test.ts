@@ -3,18 +3,21 @@ import { describe, expect, it } from 'vitest'
 import { useFirePlan } from './useFirePlan'
 
 describe('useFirePlan', () => {
-  it('starts from the default plan inputs and derives both views', () => {
+  it('starts from the defaults as valid, clean fields', () => {
     const { result } = renderHook(() => useFirePlan())
-    expect(result.current.inputs.annualSpending).toBe(60_000)
+    expect(result.current.fields.annualSpending).toBe('60000')
+    expect(result.current.applied.annualSpending).toBe(60_000)
+    expect(result.current.errors).toEqual([])
+    expect(result.current.canCalculate).toBe(true)
+    expect(result.current.dirty).toBe(false)
     expect(result.current.fire.fireNumber).toBe(1_500_000)
     expect(result.current.strike.achievable).toBe(true)
-    expect(result.current.dirty).toBe(false)
   })
 
-  it('holds edits in the draft and only recomputes on calculate', () => {
+  it('holds edits and only recomputes on calculate', () => {
     const { result } = renderHook(() => useFirePlan())
-    act(() => result.current.setField('annualSpending', 65_000))
-    expect(result.current.inputs.annualSpending).toBe(65_000)
+    act(() => result.current.setField('annualSpending', '65000'))
+    expect(result.current.fields.annualSpending).toBe('65000')
     expect(result.current.dirty).toBe(true)
     expect(result.current.applied.annualSpending).toBe(60_000)
     expect(result.current.fire.fireNumber).toBe(1_500_000)
@@ -25,23 +28,35 @@ describe('useFirePlan', () => {
     expect(result.current.fire.fireNumber).toBe(1_625_000)
   })
 
-  it('clamps out-of-range draft changes', () => {
+  it('lets the user clear and retype a field without clamping', () => {
     const { result } = renderHook(() => useFirePlan())
-    act(() => result.current.setField('currentAge', 999))
-    expect(result.current.inputs.currentAge).toBe(99)
-    act(() => result.current.setField('stockWeight', 2))
-    expect(result.current.inputs.stockWeight).toBe(1)
-    act(() => result.current.setField('annualSpending', Number.NaN))
-    expect(result.current.inputs.annualSpending).toBeGreaterThanOrEqual(1)
-    act(() => result.current.setField('targetAge', 10))
-    expect(result.current.inputs.targetAge).toBeGreaterThan(result.current.inputs.currentAge)
-    act(() => result.current.setField('drawRate', 0))
-    expect(result.current.inputs.drawRate).toBeGreaterThan(0)
+    act(() => result.current.setField('currentAge', ''))
+    expect(result.current.fields.currentAge).toBe('')
+    act(() => result.current.setField('currentAge', '4'))
+    expect(result.current.fields.currentAge).toBe('4')
+    act(() => result.current.setField('currentAge', '42'))
+    expect(result.current.fields.currentAge).toBe('42')
+    expect(result.current.errors).toEqual([])
+
+    act(() => result.current.calculate())
+    expect(result.current.applied.currentAge).toBe(42)
   })
 
-  it('applies clamped drafts on calculate', () => {
+  it('reports errors and refuses to calculate while invalid', () => {
     const { result } = renderHook(() => useFirePlan())
-    act(() => result.current.setField('drawRate', 0.05))
+    act(() => result.current.setField('annualSpending', ''))
+    expect(result.current.errors).toEqual(['Expected retirement spending is required'])
+    expect(result.current.canCalculate).toBe(false)
+    expect(result.current.dirty).toBe(true)
+
+    act(() => result.current.calculate())
+    expect(result.current.applied.annualSpending).toBe(60_000)
+    expect(result.current.fire.fireNumber).toBe(1_500_000)
+  })
+
+  it('applies advanced draw-rate edits on calculate', () => {
+    const { result } = renderHook(() => useFirePlan())
+    act(() => result.current.setField('drawRate', '5'))
     act(() => result.current.calculate())
     expect(result.current.fire.fireNumber).toBe(1_200_000)
   })

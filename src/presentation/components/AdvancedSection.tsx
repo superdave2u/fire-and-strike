@@ -1,11 +1,11 @@
-import type { PlanInputs } from '../../application/dto'
+import type { PlanField, PlanFields } from '../planFields'
 
 interface AdvancedSectionProps {
-  inputs: PlanInputs
-  onChange: (field: keyof PlanInputs, value: number) => void
+  fields: PlanFields
+  onChange: (field: PlanField, value: string) => void
 }
 
-const PERCENT_FIELDS: { field: keyof PlanInputs; label: string }[] = [
+const PERCENT_FIELDS: { field: PlanField; label: string }[] = [
   { field: 'drawRate', label: 'Draw rate (%)' },
   { field: 'stockMean', label: 'Expected stock return (%, real)' },
   { field: 'bondMean', label: 'Expected bond return (%, real)' },
@@ -13,11 +13,7 @@ const PERCENT_FIELDS: { field: keyof PlanInputs; label: string }[] = [
   { field: 'bondStd', label: 'Bond volatility (%)' },
 ]
 
-function asPercent(fraction: number): number {
-  return Number((fraction * 100).toFixed(2))
-}
-
-export function AdvancedSection({ inputs, onChange }: AdvancedSectionProps) {
+export function AdvancedSection({ fields, onChange }: AdvancedSectionProps) {
   return (
     <details className="advanced">
       <summary>Advanced assumptions</summary>
@@ -33,8 +29,8 @@ export function AdvancedSection({ inputs, onChange }: AdvancedSectionProps) {
               name={field}
               type="number"
               step={0.1}
-              value={asPercent(inputs[field])}
-              onChange={(event) => onChange(field, Number(event.target.value) / 100)}
+              value={fields[field]}
+              onChange={(event) => onChange(field, event.target.value)}
             />
           </div>
         ))}

@@ -52,3 +52,11 @@ Conventions: value objects expose `static of(value)` factories that throw on inv
   Done when: native `<details>` collapsed by default with draw rate, stock/bond returns and volatilities pre-populated; percent inputs report fractions through `onChange`.
 - [x] **T20 — Responsive charts** (`useViewportWidth` hook, App wiring, mobile CSS)
   Done when: chart width tracks viewport minus padding, clamped to 280–880; height 300 below 480 px; chart containers scroll horizontally as fallback; resize updates width.
+- [x] **T21 — Non-throwing plan validation** (`src/application/validatePlan.ts`)
+  Done when: returns friendly messages for out-of-range/missing dimensions; empty array for defaults; lives in application (domain rules mirrored for UI, VOs remain the hard invariant).
+- [x] **T22 — Raw text fields** (`src/presentation/planFields.ts`)
+  Done when: `toFields` renders values in widget units (fractions as percentages); `parseFields` reports required/non-numeric fields instead of coercing blanks to 0; no clamping; range errors delegated to `validatePlan`.
+- [x] **T23 — Draft fields + Calculate lock** (`useFirePlan`)
+  Done when: fields are raw strings; clearing/retyping works; errors and `canCalculate` derived from parse+validate; `calculate()` refuses to apply invalid drafts.
+- [x] **T24 — Warning box, locked button, newcomer guide** (`InputPanel`, `AdvancedSection`, `AboutFire`)
+  Done when: warning box above Calculate lists errors; Calculate disabled while invalid; advanced inputs are raw text too; AboutFire explains FIRE and that retirement is a financial milestone, not an age gate.

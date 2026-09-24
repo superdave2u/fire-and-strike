@@ -1,10 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { AdvancedSection } from './AdvancedSection'
+import { toFields } from '../planFields'
 import { DEFAULT_PLAN_INPUTS } from '../../application/dto'
 
 const baseProps = {
-  inputs: DEFAULT_PLAN_INPUTS,
+  fields: toFields(DEFAULT_PLAN_INPUTS),
   onChange: vi.fn(),
 }
 
@@ -22,16 +23,12 @@ describe('AdvancedSection', () => {
     expect(screen.getByLabelText('Bond volatility (%)')).toHaveValue(6)
   })
 
-  it('reports tweaks as fractions', () => {
+  it('reports tweaks as raw text', () => {
     const onChange = vi.fn()
     render(<AdvancedSection {...baseProps} onChange={onChange} />)
     fireEvent.change(screen.getByLabelText('Draw rate (%)'), { target: { value: '3.5' } })
-    expect(onChange).toHaveBeenCalledWith('drawRate', 0.035)
-    fireEvent.change(screen.getByLabelText('Expected stock return (%, real)'), {
-      target: { value: '9' },
-    })
-    expect(onChange).toHaveBeenCalledWith('stockMean', 0.09)
+    expect(onChange).toHaveBeenCalledWith('drawRate', '3.5')
     fireEvent.change(screen.getByLabelText('Stock volatility (%)'), { target: { value: '22' } })
-    expect(onChange).toHaveBeenCalledWith('stockStd', 0.22)
+    expect(onChange).toHaveBeenCalledWith('stockStd', '22')
   })
 })

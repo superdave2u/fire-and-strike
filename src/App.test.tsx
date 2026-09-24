@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { App } from './App'
 
 describe('App', () => {
-  it('renders the input panel and both chart sections', () => {
+  it('renders the input panel, both chart sections and the newcomer guide', () => {
     render(<App />)
     expect(screen.getByText('FIRE number: $1,500,000 (25 × $60,000)')).toBeInTheDocument()
     expect(screen.getByText(/Median FI at age/)).toBeInTheDocument()
@@ -11,6 +11,7 @@ describe('App', () => {
     expect(document.querySelectorAll('svg.recharts-surface').length).toBeGreaterThanOrEqual(2)
     expect(screen.getByText('Advanced assumptions')).toBeInTheDocument()
     expect(document.querySelector('details')).not.toHaveAttribute('open')
+    expect(screen.getByText('New to FIRE?')).toBeInTheDocument()
   })
 
   it('only updates the charts and readout when Calculate is pressed', () => {
@@ -24,5 +25,14 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Calculate' }))
     expect(screen.getByText('FIRE number: $1,625,000 (25 × $65,000)')).toBeInTheDocument()
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  it('blocks Calculate and warns when a field is invalid', () => {
+    render(<App />)
+    fireEvent.change(screen.getByLabelText('Expected retirement spending ($/yr)'), {
+      target: { value: '' },
+    })
+    expect(screen.getByRole('alert')).toHaveTextContent('Expected retirement spending is required')
+    expect(screen.getByRole('button', { name: 'Calculate' })).toBeDisabled()
   })
 })

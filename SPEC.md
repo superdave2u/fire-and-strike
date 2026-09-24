@@ -55,7 +55,7 @@ presentation  →  application  →  domain  ←  infrastructure (adapters)
 
 ## 4. Functional requirements
 
-- **FR-1 Inputs** (presentation, validated by value objects): current age, current portfolio value ($), yearly contribution ($/yr), expected retirement spending ($/yr), stock allocation slider (0–100%), target retirement age — plus a **collapsed advanced section** for draw rate, expected stock/bond real returns and volatilities, all pre-populated with defaults. Editing any input changes **draft** state only; the simulation runs when the user presses **Calculate** (intentional compute — no recompute per keystroke). A status message appears while draft ≠ applied.
+- **FR-1 Inputs** (presentation): current age, current portfolio value ($), yearly contribution ($/yr), expected retirement spending ($/yr), stock allocation slider (0–100%), target retirement age — plus a **collapsed advanced section** for draw rate, expected stock/bond real returns and volatilities, all pre-populated with defaults. Inputs are held as **raw text drafts** (never clamped mid-typing, so backspace/clear/retype works). Validation runs on the draft: while any field is blank, non-numeric, or out of range, a **warning box above Calculate** lists the problems and the **Calculate button is disabled**. Editing any input changes draft state only; the simulation runs when the user presses **Calculate** (intentional compute — no recompute per keystroke). A status message appears while draft ≠ applied and the draft is valid.
 - **FR-2 FIRE number** = annual spending ÷ draw rate (default 4% → ×25), shown live in the UI readout from the applied inputs.
 - **FR-3 Projection semantics (Monte Carlo):**
   - Real (inflation-adjusted) annual returns from `ReturnAssumptions`. Defaults: 100% stocks mean 7%, σ 18%; bonds mean 2.5%, σ 6%. Allocation mix blends **linearly**: `mean = w·stockMean + (1−w)·bondMean`, `std = w·stockStd + (1−w)·bondStd` (all in decimal).
@@ -66,6 +66,7 @@ presentation  →  application  →  domain  ←  infrastructure (adapters)
 - **FR-5 STRIKE solver:** binary search (whole dollars) for the smallest extra contribution c ≥ 0 such that the **p50** value at target age ≥ FIRE number. Deterministic seed ⇒ identical results for identical inputs. Solver evaluations replay the same seed with 3,000 runs (median estimate precision); FR-3's 10,000 runs apply to the FIRE projection. If already reached with current pace → 0. If unreachable even at the bracket cap → `achievable: false`.
 - **FR-6 Defaults:** age 35, portfolio $100,000, contribution $30,000/yr, spending $60,000/yr, stocks 80%, target age 55, draw rate 4% (FIRE number $1,500,000), stock return 7%, bond return 2.5%, stock volatility 18%, bond volatility 6%.
 - **FR-7 Charts (Recharts):** FIRE chart = p10/p50/p90 lines + FIRE reference line + median-crossing marker; STRIKE chart = current-pace p50 vs accelerated p50 + FIRE line + target-age line + card "Extra yearly contribution needed: $X". Charts are **responsive**: width tracks the viewport (clamped 280–880 px), height drops to 300 px on narrow screens, and each chart sits in a horizontal-scroll container as a fallback.
+- **FR-9 Newcomer guide:** the page ends with an informational section (below the charts) explaining FIRE to people unfamiliar with the acronym, and making explicit that **retirement is a financial milestone, not an age gate**: it is reached when the portfolio covers spending, may happen at any age, and is not financial advice.
 - **FR-8 Determinism:** simulation and solver use a fixed seed (42) derived at composition; the same inputs always produce identical outputs.
 
 ## 5. Non-functional requirements
@@ -98,3 +99,6 @@ presentation  →  application  →  domain  ←  infrastructure (adapters)
 - [ ] AC-7: editing inputs does not recompute; pressing Calculate updates the readout and both charts, and the stale status message clears.
 - [ ] AC-8: the advanced section is collapsed by default with the documented defaults populated; tweaks (draw rate, returns, volatilities) flow into the next Calculate.
 - [ ] AC-9: on a 375 px viewport the charts render at the clamped width without horizontal page overflow.
+- [ ] AC-10: a field can be cleared and retyped character-by-character without the value jumping or clamping.
+- [ ] AC-11: while any field is blank/invalid, a warning box appears above Calculate and the button is disabled; fixing the fields re-enables it.
+- [ ] AC-12: the page ends with a guide that states retirement is a financial milestone rather than an age gate.

@@ -2,14 +2,16 @@ import { FireChart } from './presentation/components/FireChart'
 import { InputPanel } from './presentation/components/InputPanel'
 import { AdvancedSection } from './presentation/components/AdvancedSection'
 import { StrikeChart } from './presentation/components/StrikeChart'
+import { AboutFire } from './presentation/components/AboutFire'
 import { useFirePlan } from './presentation/hooks/useFirePlan'
 import { useViewportWidth } from './presentation/hooks/useViewportWidth'
 import { describeCrossing } from './presentation/mappers/chartData'
 import { fireMultiplier } from './application/dto'
 
 export function App() {
-  const { inputs, applied, setField, calculate, dirty, fire, strike } = useFirePlan()
-  const horizon = fire.ages.at(-1) ?? inputs.currentAge
+  const { fields, applied, setField, calculate, dirty, errors, canCalculate, fire, strike } =
+    useFirePlan()
+  const horizon = fire.ages.at(-1) ?? applied.currentAge
   const width = useViewportWidth()
   const height = width < 480 ? 300 : 380
   return (
@@ -22,15 +24,17 @@ export function App() {
         </p>
       </header>
       <InputPanel
-        inputs={inputs}
+        fields={fields}
         fireNumber={fire.fireNumber}
         fireSpending={applied.annualSpending}
         multiplier={fireMultiplier(applied.drawRate)}
         dirty={dirty}
+        errors={errors}
+        canCalculate={canCalculate}
         onChange={setField}
         onCalculate={calculate}
       />
-      <AdvancedSection inputs={inputs} onChange={setField} />
+      <AdvancedSection fields={fields} onChange={setField} />
       <section>
         <h2>Current pace — FIRE projection</h2>
         <p>
@@ -48,6 +52,7 @@ export function App() {
           <StrikeChart strike={strike} fire={fire} width={width} height={height} />
         </div>
       </section>
+      <AboutFire />
     </main>
   )
 }

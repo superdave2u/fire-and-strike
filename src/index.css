@@ -102,13 +102,65 @@ figcaption {
   cursor: pointer;
 }
 
-.calculate-row button:hover {
+.calculate-row button:hover:not(:disabled) {
   background: #15803d;
+}
+
+.calculate-row button:disabled {
+  background: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
 }
 
 .calculate-row [role='status'] {
   font-size: 0.85rem;
   color: #b45309;
+}
+
+.warning {
+  grid-column: 1 / -1;
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  color: #991b1b;
+}
+
+.warning ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.about {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+}
+
+.about h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.about p {
+  color: #334155;
+}
+
+.about ul {
+  color: #334155;
+  padding-left: 1.2rem;
+}
+
+.about li {
+  margin-bottom: 0.35rem;
+}
+
+.about-disclaimer {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 0;
 }
 
 .advanced {

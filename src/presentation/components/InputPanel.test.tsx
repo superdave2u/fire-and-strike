@@ -1,14 +1,17 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { InputPanel } from './InputPanel'
+import { toFields } from '../planFields'
 import { DEFAULT_PLAN_INPUTS } from '../../application/dto'
 
 const baseProps = {
-  inputs: DEFAULT_PLAN_INPUTS,
+  fields: toFields(DEFAULT_PLAN_INPUTS),
   fireNumber: 1_500_000,
   fireSpending: 60_000,
   multiplier: 25,
   dirty: false,
+  errors: [] as string[],
+  canCalculate: true,
   onChange: vi.fn(),
   onCalculate: vi.fn(),
 }
@@ -30,21 +33,37 @@ describe('InputPanel', () => {
     expect(screen.getByText(/Stocks 80% \/ Bonds 20%/)).toBeInTheDocument()
   })
 
-  it('reports changed fields through onChange', () => {
+  it('reports changed fields as raw text through onChange', () => {
     const onChange = vi.fn()
     render(<InputPanel {...baseProps} onChange={onChange} />)
     fireEvent.change(screen.getByLabelText('Expected retirement spending ($/yr)'), {
       target: { value: '65000' },
     })
-    expect(onChange).toHaveBeenCalledWith('annualSpending', 65000)
+    expect(onChange).toHaveBeenCalledWith('annualSpending', '65000')
     fireEvent.change(screen.getByRole('slider'), { target: { value: '50' } })
-    expect(onChange).toHaveBeenLastCalledWith('stockWeight', 0.5)
+    expect(onChange).toHaveBeenLastCalledWith('stockWeight', '50')
   })
 
-  it('invokes calculate from the button', () => {
+  it('shows a warning box and locks Calculate while fields are invalid', () => {
+    render(
+      <InputPanel
+        {...baseProps}
+        dirty
+        canCalculate={false}
+        errors={['Expected retirement spending is required']}
+      />,
+    )
+    expect(screen.getByRole('alert')).toHaveTextContent('Expected retirement spending is required')
+    expect(screen.getByRole('button', { name: 'Calculate' })).toBeDisabled()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  it('enables Calculate when valid and invokes it', () => {
     const onCalculate = vi.fn()
-    render(<InputPanel {...baseProps} onCalculate={onCalculate} dirty />)
-    fireEvent.click(screen.getByRole('button', { name: 'Calculate' }))
+    render(<InputPanel {...baseProps} dirty onCalculate={onCalculate} />)
+    const button = screen.getByRole('button', { name: 'Calculate' })
+    expect(button).toBeEnabled()
+    fireEvent.click(button)
     expect(onCalculate).toHaveBeenCalledTimes(1)
   })
 

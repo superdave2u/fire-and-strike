@@ -1,17 +1,19 @@
 import { formatMultiplier, formatUsd } from '../format'
-import type { PlanInputs } from '../../application/dto'
+import type { PlanField, PlanFields } from '../planFields'
 
 interface InputPanelProps {
-  inputs: PlanInputs
+  fields: PlanFields
   fireNumber: number
   fireSpending: number
   multiplier: number
   dirty: boolean
-  onChange: (field: keyof PlanInputs, value: number) => void
+  errors: string[]
+  canCalculate: boolean
+  onChange: (field: PlanField, value: string) => void
   onCalculate: () => void
 }
 
-const FIELDS: { field: keyof PlanInputs; label: string }[] = [
+const FIELDS: { field: PlanField; label: string }[] = [
   { field: 'currentAge', label: 'Current age' },
   { field: 'currentPortfolio', label: 'Current portfolio value ($)' },
   { field: 'yearlyContribution', label: 'Yearly contribution ($/yr)' },
@@ -20,15 +22,21 @@ const FIELDS: { field: keyof PlanInputs; label: string }[] = [
 ]
 
 export function InputPanel({
-  inputs,
+  fields,
   fireNumber,
   fireSpending,
   multiplier,
   dirty,
+  errors,
+  canCalculate,
   onChange,
   onCalculate,
 }: InputPanelProps) {
-  const stocks = Math.round(inputs.stockWeight * 100)
+  const parsedStocks = Number(fields.stockWeight)
+  const stocks = Number.isFinite(parsedStocks)
+    ? Math.min(100, Math.max(0, Math.round(parsedStocks)))
+    : 0
+  const hasErrors = errors.length > 0
   return (
     <section aria-label="Plan inputs">
       {FIELDS.map(({ field, label }) => (
@@ -38,8 +46,8 @@ export function InputPanel({
             id={field}
             name={field}
             type="number"
-            value={inputs[field]}
-            onChange={(event) => onChange(field, Number(event.target.value))}
+            value={fields[field]}
+            onChange={(event) => onChange(field, event.target.value)}
           />
         </div>
       ))}
@@ -53,14 +61,26 @@ export function InputPanel({
           max={100}
           step={1}
           value={stocks}
-          onChange={(event) => onChange('stockWeight', Number(event.target.value) / 100)}
+          onChange={(event) => onChange('stockWeight', event.target.value)}
         />
       </div>
+      {hasErrors && (
+        <div role="alert" className="warning">
+          <strong>Please fix these before calculating:</strong>
+          <ul>
+            {errors.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="calculate-row">
-        <button type="button" onClick={onCalculate}>
+        <button type="button" onClick={onCalculate} disabled={!canCalculate}>
           Calculate
         </button>
-        {dirty && <span role="status">Inputs changed — press Calculate to update the charts</span>}
+        {dirty && !hasErrors && (
+          <span role="status">Inputs changed — press Calculate to update the charts</span>
+        )}
       </div>
       <p>
         FIRE number: {formatUsd(fireNumber)} ({formatMultiplier(multiplier)} × {formatUsd(fireSpending)})

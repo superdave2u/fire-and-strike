@@ -22,10 +22,6 @@ export function formatMultiplier(multiplier: number): string {
   return trim(Number(multiplier.toFixed(2)).toString())
 }
 
-export function formatPercent(fraction: number): string {
-  return `${trim(Number((fraction * 100).toFixed(2)).toString())}%`
-}
-
 function trim(value: string): string {
   return value.endsWith('.0') ? value.slice(0, -2) : value
 }

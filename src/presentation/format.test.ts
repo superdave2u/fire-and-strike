@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatUsd, compactUsd, formatMultiplier, formatPercent } from './format'
+import { formatUsd, compactUsd, formatMultiplier } from './format'
 
 describe('formatUsd', () => {
   it('formats whole-dollar currency', () => {
@@ -24,13 +24,5 @@ describe('formatMultiplier', () => {
   it('formats the FIRE multiplier without trailing noise', () => {
     expect(formatMultiplier(25)).toBe('25')
     expect(formatMultiplier(1 / 0.035)).toBe('28.57')
-  })
-})
-
-describe('formatPercent', () => {
-  it('formats fractions as percentages', () => {
-    expect(formatPercent(0.04)).toBe('4%')
-    expect(formatPercent(0.025)).toBe('2.5%')
-    expect(formatPercent(0.1)).toBe('10%')
   })
 })
