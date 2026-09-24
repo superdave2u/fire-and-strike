@@ -42,5 +42,5 @@ Conventions: value objects expose `static of(value)` factories that throw on inv
   Done when: renders current vs accelerated p50 lines + FIRE line + target-age reference line + the "Extra yearly contribution needed" card (or "Already on pace"/"Not achievable" variants).
 - [x] **T15 — useFirePlan hook + App wiring** (`src/presentation/hooks/useFirePlan.ts`, `src/App.tsx`, `src/index.css`)
   Done when: hook holds FR-6 defaults, derives both views via the use cases (memoized), clamps invalid input changes; App renders InputPanel + both chart sections and updates the FIRE-number readout and STRIKE card live as inputs change; template boilerplate (App.css, assets) removed.
-- [ ] **T16 — GitHub Pages deployment** (`.github/workflows/deploy.yml`, `vite.config.ts` base already `/fire-and-strike/`)
+- [x] **T16 — GitHub Pages deployment** (`.github/workflows/deploy.yml`, `vite.config.ts` base already `/fire-and-strike/`)
   Done when: workflow has build job (npm ci → lint → typecheck → vitest run → build → configure-pages → upload-pages-artifact) and deploy job (needs: build, deploy-pages, environment github-pages, permissions pages:write + id-token:write, concurrency: pages); local `npm run gates` + `npm run build` green; `dist/index.html` references `/fire-and-strike/` assets; README deployment handoff steps verified.

@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -b",
     "gates": "npm run lint && npm run typecheck && npm test",
     "preview": "vite preview"
   },

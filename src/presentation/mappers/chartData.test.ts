@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { toFireRows, toStrikeRows, describeCrossing, type FireProjectionView, type StrikePlanView } from './chartData'
+import { toFireRows, toStrikeRows, describeCrossing } from './chartData'
+import type { FireProjectionView, StrikePlanView } from '../../application/dto'
 
 const fireView: FireProjectionView = {
   ages: [35, 36],

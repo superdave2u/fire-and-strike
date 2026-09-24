@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { SolveStrikePlan } from './SolveStrikePlan'
 import { DEFAULT_PLAN_INPUTS } from './dto'
 import { CyclingDraws, fakePercentile } from '../domain/services/testFixtures'
-import { GaussianReturnModel } from '../domain/services/GaussianReturnModel'
 import { PercentileAggregator } from '../domain/services/PercentileAggregator'
 
 function useCaseWith(seed: number, maxExtra?: number): SolveStrikePlan {

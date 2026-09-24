@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { ProjectFireTrajectory } from './ProjectFireTrajectory'
 import { DEFAULT_PLAN_INPUTS } from './dto'
 import { CyclingDraws, fakePercentile } from '../domain/services/testFixtures'
-import { GaussianReturnModel } from '../domain/services/GaussianReturnModel'
 import { PercentileAggregator } from '../domain/services/PercentileAggregator'
 
 function useCaseWith(seed: number): ProjectFireTrajectory {
