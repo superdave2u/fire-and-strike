@@ -1,5 +1,5 @@
 import { formatMultiplier, formatUsd } from '../format'
-import type { PlanField, PlanFields } from '../planFields'
+import type { PlanError, PlanField, PlanFields } from '../planFields'
 
 interface InputPanelProps {
   fields: PlanFields
@@ -7,8 +7,8 @@ interface InputPanelProps {
   fireSpending: number
   multiplier: number
   dirty: boolean
-  errors: string[]
-  canCalculate: boolean
+  errors: PlanError[]
+  invalidFields: PlanField[]
   onChange: (field: PlanField, value: string) => void
   onCalculate: () => void
 }
@@ -28,7 +28,7 @@ export function InputPanel({
   multiplier,
   dirty,
   errors,
-  canCalculate,
+  invalidFields,
   onChange,
   onCalculate,
 }: InputPanelProps) {
@@ -37,6 +37,7 @@ export function InputPanel({
     ? Math.min(100, Math.max(0, Math.round(parsedStocks)))
     : 0
   const hasErrors = errors.length > 0
+  const isInvalid = (field: PlanField): boolean => invalidFields.includes(field)
   return (
     <section aria-label="Plan inputs">
       {FIELDS.map(({ field, label }) => (
@@ -47,6 +48,7 @@ export function InputPanel({
             name={field}
             type="number"
             value={fields[field]}
+            aria-invalid={isInvalid(field)}
             onChange={(event) => onChange(field, event.target.value)}
           />
         </div>
@@ -69,13 +71,13 @@ export function InputPanel({
           <strong>Please fix these before calculating:</strong>
           <ul>
             {errors.map((error) => (
-              <li key={error}>{error}</li>
+              <li key={error.field}>{error.message}</li>
             ))}
           </ul>
         </div>
       )}
       <div className="calculate-row">
-        <button type="button" onClick={onCalculate} disabled={!canCalculate}>
+        <button type="button" onClick={onCalculate}>
           Calculate
         </button>
         {dirty && !hasErrors && (

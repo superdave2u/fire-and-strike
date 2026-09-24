@@ -3,6 +3,12 @@ import { describe, expect, it, vi } from 'vitest'
 import { InputPanel } from './InputPanel'
 import { toFields } from '../planFields'
 import { DEFAULT_PLAN_INPUTS } from '../../application/dto'
+import type { PlanError, PlanField } from '../../application/dto'
+
+const requiredError: PlanError = {
+  field: 'annualSpending',
+  message: 'Expected retirement spending is required',
+}
 
 const baseProps = {
   fields: toFields(DEFAULT_PLAN_INPUTS),
@@ -10,8 +16,8 @@ const baseProps = {
   fireSpending: 60_000,
   multiplier: 25,
   dirty: false,
-  errors: [] as string[],
-  canCalculate: true,
+  errors: [] as PlanError[],
+  invalidFields: [] as PlanField[],
   onChange: vi.fn(),
   onCalculate: vi.fn(),
 }
@@ -44,33 +50,48 @@ describe('InputPanel', () => {
     expect(onChange).toHaveBeenLastCalledWith('stockWeight', '50')
   })
 
-  it('shows a warning box and locks Calculate while fields are invalid', () => {
+  it('shows the warning box and marks invalid fields when errors are surfaced', () => {
     render(
       <InputPanel
         {...baseProps}
         dirty
-        canCalculate={false}
-        errors={['Expected retirement spending is required']}
+        errors={[requiredError]}
+        invalidFields={['annualSpending']}
       />,
     )
-    expect(screen.getByRole('alert')).toHaveTextContent('Expected retirement spending is required')
-    expect(screen.getByRole('button', { name: 'Calculate' })).toBeDisabled()
-    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent(requiredError.message)
+    expect(screen.getByLabelText('Expected retirement spending ($/yr)')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    )
+    expect(screen.getByLabelText('Current age')).toHaveAttribute('aria-invalid', 'false')
   })
 
-  it('enables Calculate when valid and invokes it', () => {
+  it('keeps Calculate clickable even while invalid so it can surface warnings', () => {
     const onCalculate = vi.fn()
-    render(<InputPanel {...baseProps} dirty onCalculate={onCalculate} />)
+    render(
+      <InputPanel
+        {...baseProps}
+        errors={[requiredError]}
+        invalidFields={['annualSpending']}
+        onCalculate={onCalculate}
+      />,
+    )
     const button = screen.getByRole('button', { name: 'Calculate' })
     expect(button).toBeEnabled()
     fireEvent.click(button)
     expect(onCalculate).toHaveBeenCalledTimes(1)
   })
 
-  it('warns while the draft differs from the applied plan', () => {
+  it('warns while the draft differs from the applied plan and is valid', () => {
     const { rerender } = render(<InputPanel {...baseProps} />)
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
     rerender(<InputPanel {...baseProps} dirty />)
     expect(screen.getByRole('status')).toHaveTextContent(/press Calculate/i)
+  })
+
+  it('does not show the stale hint while warnings are present', () => {
+    render(<InputPanel {...baseProps} dirty errors={[requiredError]} invalidFields={['annualSpending']} />)
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 })

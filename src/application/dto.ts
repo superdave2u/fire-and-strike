@@ -24,6 +24,13 @@ export interface PlanInputs {
   bondStd: number
 }
 
+export type PlanField = keyof PlanInputs
+
+export interface PlanError {
+  field: PlanField
+  message: string
+}
+
 export const DEFAULT_PLAN_INPUTS: PlanInputs = {
   currentAge: 35,
   currentPortfolio: 100_000,

@@ -27,12 +27,19 @@ describe('App', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
-  it('blocks Calculate and warns when a field is invalid', () => {
+  it('surfaces warnings only after Calculate, then clears them when corrected', () => {
     render(<App />)
-    fireEvent.change(screen.getByLabelText('Expected retirement spending ($/yr)'), {
-      target: { value: '' },
-    })
+    const field = screen.getByLabelText('Expected retirement spending ($/yr)')
+    fireEvent.change(field, { target: { value: '' } })
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(field).toHaveAttribute('aria-invalid', 'false')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Calculate' }))
     expect(screen.getByRole('alert')).toHaveTextContent('Expected retirement spending is required')
-    expect(screen.getByRole('button', { name: 'Calculate' })).toBeDisabled()
+    expect(field).toHaveAttribute('aria-invalid', 'true')
+
+    fireEvent.change(field, { target: { value: '65000' } })
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(field).toHaveAttribute('aria-invalid', 'false')
   })
 })

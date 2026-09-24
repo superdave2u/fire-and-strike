@@ -35,7 +35,9 @@ describe('parseFields', () => {
   it('reports required fields instead of coercing blanks to zero', () => {
     const { inputs, errors } = parseFields({ ...toFields(DEFAULT_PLAN_INPUTS), annualSpending: '' })
     expect(inputs).toBeNull()
-    expect(errors).toEqual(['Expected retirement spending is required'])
+    expect(errors).toEqual([
+      { field: 'annualSpending', message: 'Expected retirement spending is required' },
+    ])
   })
 
   it('accepts partial editing states without clamping', () => {
@@ -49,14 +51,16 @@ describe('parseFields', () => {
     expect(inputs?.stockWeight).toBeCloseTo(0.025, 12)
   })
 
-  it('reports non-numeric text', () => {
+  it('reports non-numeric text against its field', () => {
     const { errors } = parseFields({ ...toFields(DEFAULT_PLAN_INPUTS), drawRate: 'abc' })
-    expect(errors).toEqual(['Draw rate must be a number'])
+    expect(errors).toEqual([{ field: 'drawRate', message: 'Draw rate must be a number' }])
   })
 
   it('collects range errors from plan validation', () => {
     const { inputs, errors } = parseFields({ ...toFields(DEFAULT_PLAN_INPUTS), drawRate: '0' })
     expect(inputs).toBeNull()
-    expect(errors).toEqual(['Draw rate must be greater than 0% and at most 100%'])
+    expect(errors).toEqual([
+      { field: 'drawRate', message: 'Draw rate must be greater than 0% and at most 100%' },
+    ])
   })
 })

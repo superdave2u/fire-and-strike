@@ -9,7 +9,7 @@ import { describeCrossing } from './presentation/mappers/chartData'
 import { fireMultiplier } from './application/dto'
 
 export function App() {
-  const { fields, applied, setField, calculate, dirty, errors, canCalculate, fire, strike } =
+  const { fields, applied, setField, calculate, dirty, errors, invalidFields, fire, strike } =
     useFirePlan()
   const horizon = fire.ages.at(-1) ?? applied.currentAge
   const width = useViewportWidth()
@@ -30,11 +30,11 @@ export function App() {
         multiplier={fireMultiplier(applied.drawRate)}
         dirty={dirty}
         errors={errors}
-        canCalculate={canCalculate}
+        invalidFields={invalidFields}
         onChange={setField}
         onCalculate={calculate}
       />
-      <AdvancedSection fields={fields} onChange={setField} />
+      <AdvancedSection fields={fields} invalidFields={invalidFields} onChange={setField} />
       <section>
         <h2>Current pace — FIRE projection</h2>
         <p>

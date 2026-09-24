@@ -1,12 +1,12 @@
 import { validatePlan } from '../application/validatePlan'
-import type { PlanInputs } from '../application/dto'
+import type { PlanError, PlanField, PlanInputs } from '../application/dto'
 
-export type PlanField = keyof PlanInputs
+export type { PlanError, PlanField } from '../application/dto'
 export type PlanFields = Record<PlanField, string>
 
 export interface ParsedFields {
   inputs: PlanInputs | null
-  errors: string[]
+  errors: PlanError[]
 }
 
 const FIELD_LABELS: Record<PlanField, string> = {
@@ -53,18 +53,18 @@ export function toFields(inputs: PlanInputs): PlanFields {
 }
 
 export function parseFields(fields: PlanFields): ParsedFields {
-  const errors: string[] = []
+  const errors: PlanError[] = []
   const numeric = {} as Record<PlanField, number>
 
   for (const field of Object.keys(FIELD_LABELS) as PlanField[]) {
     const raw = fields[field].trim()
     if (raw === '') {
-      errors.push(`${FIELD_LABELS[field]} is required`)
+      errors.push({ field, message: `${FIELD_LABELS[field]} is required` })
       continue
     }
     const value = Number(raw)
     if (!Number.isFinite(value)) {
-      errors.push(`${FIELD_LABELS[field]} must be a number`)
+      errors.push({ field, message: `${FIELD_LABELS[field]} must be a number` })
       continue
     }
     numeric[field] = PERCENT_FIELDS.includes(field) ? value / 100 : value

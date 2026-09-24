@@ -59,4 +59,6 @@ Conventions: value objects expose `static of(value)` factories that throw on inv
 - [x] **T23 — Draft fields + Calculate lock** (`useFirePlan`)
   Done when: fields are raw strings; clearing/retyping works; errors and `canCalculate` derived from parse+validate; `calculate()` refuses to apply invalid drafts.
 - [x] **T24 — Warning box, locked button, newcomer guide** (`InputPanel`, `AdvancedSection`, `AboutFire`)
-  Done when: warning box above Calculate lists errors; Calculate disabled while invalid; advanced inputs are raw text too; AboutFire explains FIRE and that retirement is a financial milestone, not an age gate.
+  Done when: warning box above Calculate lists errors; advanced inputs are raw text too; AboutFire explains FIRE and that retirement is a financial milestone, not an age gate.
+- [x] **T25 — On-click validation with field highlighting** (`validatePlan` field-tagged errors, submit-gated `useFirePlan`)
+  Done when: nothing is flagged while typing; pressing Calculate on an invalid draft shows the warning box and marks offending fields invalid (red + `aria-invalid`); warnings persist until the field is corrected; Calculate stays clickable; valid clicks apply and clear warnings.

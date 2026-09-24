@@ -2,6 +2,7 @@ import type { PlanField, PlanFields } from '../planFields'
 
 interface AdvancedSectionProps {
   fields: PlanFields
+  invalidFields: PlanField[]
   onChange: (field: PlanField, value: string) => void
 }
 
@@ -13,7 +14,7 @@ const PERCENT_FIELDS: { field: PlanField; label: string }[] = [
   { field: 'bondStd', label: 'Bond volatility (%)' },
 ]
 
-export function AdvancedSection({ fields, onChange }: AdvancedSectionProps) {
+export function AdvancedSection({ fields, invalidFields, onChange }: AdvancedSectionProps) {
   return (
     <details className="advanced">
       <summary>Advanced assumptions</summary>
@@ -30,6 +31,7 @@ export function AdvancedSection({ fields, onChange }: AdvancedSectionProps) {
               type="number"
               step={0.1}
               value={fields[field]}
+              aria-invalid={invalidFields.includes(field)}
               onChange={(event) => onChange(field, event.target.value)}
             />
           </div>

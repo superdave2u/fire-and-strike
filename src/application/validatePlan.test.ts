@@ -7,9 +7,9 @@ describe('validatePlan', () => {
     expect(validatePlan(DEFAULT_PLAN_INPUTS)).toEqual([])
   })
 
-  it('flags a non-positive current age', () => {
+  it('flags a non-positive current age against the field', () => {
     expect(validatePlan({ ...DEFAULT_PLAN_INPUTS, currentAge: 0 })).toEqual([
-      'Current age must be a whole number between 1 and 100',
+      { field: 'currentAge', message: 'Current age must be a whole number between 1 and 100' },
     ])
   })
 
@@ -19,17 +19,21 @@ describe('validatePlan', () => {
 
   it('flags non-positive spending', () => {
     expect(validatePlan({ ...DEFAULT_PLAN_INPUTS, annualSpending: 0 })).toEqual([
-      'Expected retirement spending must be greater than 0',
+      { field: 'annualSpending', message: 'Expected retirement spending must be greater than 0' },
     ])
   })
 
   it('flags a target age that is not after the current age', () => {
     expect(validatePlan({ ...DEFAULT_PLAN_INPUTS, targetAge: 35 })).toEqual([
-      'Target retirement age must be a whole number greater than current age and at most 101',
+      {
+        field: 'targetAge',
+        message:
+          'Target retirement age must be a whole number greater than current age and at most 101',
+      },
     ])
   })
 
-  it('flags out-of-range allocation, draw rate and volatility', () => {
+  it('flags out-of-range allocation, draw rate and volatility per field', () => {
     const errors = validatePlan({
       ...DEFAULT_PLAN_INPUTS,
       stockWeight: 1.5,
@@ -37,7 +41,13 @@ describe('validatePlan', () => {
       stockStd: -1,
       bondStd: 2,
     })
-    expect(errors).toEqual([
+    expect(errors.map((error) => error.field)).toEqual([
+      'stockWeight',
+      'drawRate',
+      'stockStd',
+      'bondStd',
+    ])
+    expect(errors.map((error) => error.message)).toEqual([
       'Stock allocation must be between 0 and 100%',
       'Draw rate must be greater than 0% and at most 100%',
       'Stock volatility must be between 0 and 100%',
@@ -46,8 +56,9 @@ describe('validatePlan', () => {
   })
 
   it('flags non-finite values', () => {
-    expect(validatePlan({ ...DEFAULT_PLAN_INPUTS, stockMean: Number.NaN })).toContain(
-      'Expected stock return must be between -50% and 50%',
-    )
+    expect(validatePlan({ ...DEFAULT_PLAN_INPUTS, stockMean: Number.NaN })).toContainEqual({
+      field: 'stockMean',
+      message: 'Expected stock return must be between -50% and 50%',
+    })
   })
 })
