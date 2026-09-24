@@ -11,11 +11,16 @@ describe('App', () => {
     expect(document.querySelectorAll('svg.recharts-surface').length).toBeGreaterThanOrEqual(2)
   })
 
-  it('updates the FIRE number and charts live when spending changes', () => {
+  it('only updates the charts and readout when Calculate is pressed', () => {
     render(<App />)
     fireEvent.change(screen.getByLabelText('Expected retirement spending ($/yr)'), {
       target: { value: '65000' },
     })
+    expect(screen.getByText('FIRE number: $1,500,000 (25 × $60,000)')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(/press Calculate/i)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Calculate' }))
     expect(screen.getByText('FIRE number: $1,625,000 (25 × $65,000)')).toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 })

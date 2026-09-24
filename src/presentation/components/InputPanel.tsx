@@ -1,10 +1,14 @@
-import { formatUsd } from '../format'
+import { formatMultiplier, formatUsd } from '../format'
 import type { PlanInputs } from '../../application/dto'
 
 interface InputPanelProps {
   inputs: PlanInputs
   fireNumber: number
+  fireSpending: number
+  multiplier: number
+  dirty: boolean
   onChange: (field: keyof PlanInputs, value: number) => void
+  onCalculate: () => void
 }
 
 const FIELDS: { field: keyof PlanInputs; label: string }[] = [
@@ -15,7 +19,15 @@ const FIELDS: { field: keyof PlanInputs; label: string }[] = [
   { field: 'targetAge', label: 'Target retirement age' },
 ]
 
-export function InputPanel({ inputs, fireNumber, onChange }: InputPanelProps) {
+export function InputPanel({
+  inputs,
+  fireNumber,
+  fireSpending,
+  multiplier,
+  dirty,
+  onChange,
+  onCalculate,
+}: InputPanelProps) {
   const stocks = Math.round(inputs.stockWeight * 100)
   return (
     <section aria-label="Plan inputs">
@@ -44,8 +56,14 @@ export function InputPanel({ inputs, fireNumber, onChange }: InputPanelProps) {
           onChange={(event) => onChange('stockWeight', Number(event.target.value) / 100)}
         />
       </div>
+      <div className="calculate-row">
+        <button type="button" onClick={onCalculate}>
+          Calculate
+        </button>
+        {dirty && <span role="status">Inputs changed — press Calculate to update the charts</span>}
+      </div>
       <p>
-        FIRE number: {formatUsd(fireNumber)} (25 × {formatUsd(inputs.annualSpending)})
+        FIRE number: {formatUsd(fireNumber)} ({formatMultiplier(multiplier)} × {formatUsd(fireSpending)})
       </p>
     </section>
   )

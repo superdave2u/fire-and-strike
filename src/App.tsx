@@ -3,9 +3,11 @@ import { InputPanel } from './presentation/components/InputPanel'
 import { StrikeChart } from './presentation/components/StrikeChart'
 import { useFirePlan } from './presentation/hooks/useFirePlan'
 import { describeCrossing } from './presentation/mappers/chartData'
+import { fireMultiplier } from './application/dto'
 
 export function App() {
-  const { inputs, setField, fire, strike } = useFirePlan()
+  const { inputs, applied, setField, calculate, dirty, fire, strike } = useFirePlan()
+  const horizon = fire.ages.at(-1) ?? inputs.currentAge
   return (
     <main>
       <header>
@@ -15,13 +17,21 @@ export function App() {
           (the STRIKE) to retire at the age you declare.
         </p>
       </header>
-      <InputPanel inputs={inputs} fireNumber={fire.fireNumber} onChange={setField} />
+      <InputPanel
+        inputs={inputs}
+        fireNumber={fire.fireNumber}
+        fireSpending={applied.annualSpending}
+        multiplier={fireMultiplier(applied.drawRate)}
+        dirty={dirty}
+        onChange={setField}
+        onCalculate={calculate}
+      />
       <section>
         <h2>Current pace — FIRE projection</h2>
         <p>
-          Median FI at age {describeCrossing(fire.crossings.p50, fire.ages.at(-1) ?? inputs.currentAge)}{' '}
-          (p10: {describeCrossing(fire.crossings.p10, fire.ages.at(-1) ?? inputs.currentAge)}, p90:{' '}
-          {describeCrossing(fire.crossings.p90, fire.ages.at(-1) ?? inputs.currentAge)})
+          Median FI at age {describeCrossing(fire.crossings.p50, horizon)} (p10:{' '}
+          {describeCrossing(fire.crossings.p10, horizon)}, p90:{' '}
+          {describeCrossing(fire.crossings.p90, horizon)})
         </p>
         <FireChart view={fire} />
       </section>
