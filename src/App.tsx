@@ -1,5 +1,6 @@
 import { FireChart } from './presentation/components/FireChart'
 import { InputPanel } from './presentation/components/InputPanel'
+import { AdvancedSection } from './presentation/components/AdvancedSection'
 import { StrikeChart } from './presentation/components/StrikeChart'
 import { useFirePlan } from './presentation/hooks/useFirePlan'
 import { describeCrossing } from './presentation/mappers/chartData'
@@ -26,6 +27,7 @@ export function App() {
         onChange={setField}
         onCalculate={calculate}
       />
+      <AdvancedSection inputs={inputs} onChange={setField} />
       <section>
         <h2>Current pace — FIRE projection</h2>
         <p>

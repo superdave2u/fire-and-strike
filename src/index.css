@@ -77,3 +77,88 @@ figcaption {
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
+
+.calculate-row {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.calculate-row button {
+  padding: 0.5rem 1.1rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: #16a34a;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.calculate-row button:hover {
+  background: #15803d;
+}
+
+.calculate-row [role='status'] {
+  font-size: 0.85rem;
+  color: #b45309;
+}
+
+.advanced {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+}
+
+.advanced summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.advanced-hint {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem 1.25rem;
+}
+
+.advanced-grid div {
+  display: flex;
+  flex-direction: column;
+}
+
+.advanced-grid label {
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.advanced-grid input {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+}
+
+@media (max-width: 640px) {
+  main {
+    padding: 0.75rem;
+  }
+
+  section,
+  .advanced {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+  }
+}

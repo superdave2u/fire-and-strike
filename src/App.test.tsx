@@ -9,6 +9,8 @@ describe('App', () => {
     expect(screen.getByText(/Median FI at age/)).toBeInTheDocument()
     expect(screen.getByText(/Extra yearly contribution needed/)).toBeInTheDocument()
     expect(document.querySelectorAll('svg.recharts-surface').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByText('Advanced assumptions')).toBeInTheDocument()
+    expect(document.querySelector('details')).not.toHaveAttribute('open')
   })
 
   it('only updates the charts and readout when Calculate is pressed', () => {
