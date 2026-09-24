@@ -1,32 +1,68 @@
-# React + TypeScript + Vite
+# Fire & Strike
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A retirement calculator for the FIRE (Financial Independence, Retire Early) community with two use cases:
 
-Currently, two official plugins are available:
+1. **FIRE projection (current pace)** — enter your expected retirement spending, current age, current portfolio value and yearly contribution. The app runs a Monte Carlo simulation over real (inflation-adjusted) returns and charts the **p10 / p50 / p90** paths of your portfolio vs age, with the moment each percentile reaches your FIRE number (spending × 25, the 4% rule).
+2. **STRIKE plan (accelerated pace)** — declare a target retirement age. The app solves for the **extra yearly contribution** required so that the **median (p50)** path reaches FIRE exactly at that age, and charts the accelerated path against your current pace.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Quickstart
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev        # dev server under /fire-and-strike/ (matches Pages base path)
+npm test           # vitest (one shot)
+npm run test:watch # vitest watch
+npm run lint       # oxlint
+npm run typecheck  # tsc --noEmit
+npm run gates      # lint + typecheck + tests — must pass before every commit
+npm run build      # tsc -b && vite build (outputs dist/)
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Architecture
+
+Onion / Clean layering, dependencies point inward. See **[SPEC.md](SPEC.md)** — the spec of record — for the ubiquitous language, layer rules, SOLID conventions, functional requirements and acceptance criteria. See **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** for the ordered task list.
+
+```
+src/domain           pure TypeScript: value objects, services, ports (no framework imports)
+src/application      use cases orchestrating the domain (ProjectFireTrajectory, SolveStrikePlan)
+src/infrastructure   adapters implementing domain ports (seeded RNG, percentile math)
+src/presentation     React components, hooks, pure chart-data mappers
+```
+
+The domain layer is guarded by an arch-unit test (`src/domain/boundaries.test.ts`): if any domain file imports react/recharts/application/infrastructure/presentation, the suite fails.
+
+## Ralph Wiggum iteration loop
+
+This repository is designed to be built by a "dumb loop" harness: an agent given the same fixed instructions every iteration, making progress task-by-task, with the test suite as the only error correction.
+
+- `SPEC.md` — what to build and the practices to follow (DDD, TDD, Onion/Clean, SOLID).
+- `IMPLEMENTATION_PLAN.md` — ordered, checkboxed tasks; each is one TDD cycle with explicit done-when gates.
+- `scripts/ralph.sh` — the loop:
+
+```bash
+./scripts/ralph.sh          # up to 25 iterations
+./scripts/ralph.sh 10       # custom cap
+touch .ralph/STOP           # graceful stop between iterations
+```
+
+Each iteration instructs the agent (default `opencode run`, override with `RALPH_AGENT="..."`) to: read the docs, execute the **first unchecked task** per strict TDD, run the gates, commit with a conventional message, tick the checkbox. The loop halts on: cap reached, `.ralph/STOP`, `.ralph/DONE` (all tasks checked), or an iteration that produces no commit (fail-safe).
+
+## Deploying to GitHub Pages
+
+`.github/workflows/deploy.yml` builds and deploys on every push to `main` (and manual `workflow_dispatch`). The build job runs the full CI gate (lint, typecheck, tests) before the deploy job publishes `dist/` via the official GitHub Pages actions.
+
+One-time handoff:
+
+1. Create the GitHub repo and push `main`:
+   ```bash
+   gh repo create fire-and-strike --public --source=. --push
+   ```
+2. Enable Pages with the Actions source (one-time):
+   ```bash
+   gh api -X POST repos/<owner>/fire-and-strike/pages -f build_type=workflow
+   ```
+   (or Settings → Pages → Build and deployment → Source: "GitHub Actions")
+3. Re-run the workflow (`workflow_dispatch`) or push once more; the site lands at
+   `https://<owner>.github.io/fire-and-strike/`.
+
+If the repo slug differs from `fire-and-strike`, change `base` in `vite.config.ts` to `'/<repo-slug>/'` so assets resolve on the project page.
